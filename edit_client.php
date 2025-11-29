@@ -4,25 +4,25 @@ require_once 'header.php';
 
 $message = '';
 $error = '';
-$participant = null;
+$client = null;
 
 if (!isset($_GET['id']) && !isset($_POST['id'])) {
-    echo '<div class="feedback error">No participant ID specified.</div>';
+    echo '<div class="feedback error">No client ID specified.</div>';
     require_once 'footer.php';
     exit;
 }
 
-$participant_id = $_GET['id'] ?? $_POST['id'];
+$client_id = $_GET['id'] ?? $_POST['id'];
 
 try {
     $db = db();
-    $stmt = $db->prepare("SELECT * FROM participants WHERE id = :id");
-    $stmt->bindParam(':id', $participant_id, PDO::PARAM_INT);
+    $stmt = $db->prepare("SELECT * FROM clients WHERE id = :id");
+    $stmt->bindParam(':id', $client_id, PDO::PARAM_INT);
     $stmt->execute();
-    $participant = $stmt->fetch(PDO::FETCH_ASSOC);
+    $client = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$participant) {
-        throw new Exception("Participant not found.");
+    if (!$client) {
+        throw new Exception("Client not found.");
     }
 } catch (Exception $e) {
     $error = "Error: " . $e->getMessage();
@@ -42,9 +42,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        $sql = "UPDATE participants SET 
+        $sql = "UPDATE clients SET 
             full_legal_name = :full_legal_name, 
-            ndis_participant_number = :ndis_participant_number, 
+            ndis_client_number = :ndis_client_number, 
             date_of_birth = :date_of_birth, 
             preferred_contact_method = :preferred_contact_method,
             primary_phone = :primary_phone, 
@@ -70,11 +70,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $stmt = $db->prepare($sql);
 
         $consent = isset($_POST['consent_for_info_sharing']) ? 1 : 0;
-        $participant_id = $_POST['id'];
+        $client_id = $_POST['id'];
 
-        $stmt->bindParam(':id', $participant_id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $client_id, PDO::PARAM_INT);
         $stmt->bindParam(':full_legal_name', $_POST['full_legal_name']);
-        $stmt->bindParam(':ndis_participant_number', $_POST['ndis_participant_number']);
+        $stmt->bindParam(':ndis_client_number', $_POST['ndis_client_number']);
         $stmt->bindParam(':date_of_birth', $_POST['date_of_birth']);
         $stmt->bindParam(':preferred_contact_method', $_POST['preferred_contact_method']);
         $stmt->bindParam(':primary_phone', $_POST['primary_phone']);
@@ -98,7 +98,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt->execute();
         
-        header("Location: participant_detail.php?id=" . $participant_id . "&message=updated");
+        header("Location: client_detail.php?id=" . $client_id . "&message=updated");
         exit;
         
     } catch (Exception $e) {
@@ -114,7 +114,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </style>
 
 <header>
-    <h1>Edit Participant: <?php echo htmlspecialchars($participant['full_legal_name']); ?></h1>
+    <h1>Edit Client: <?php echo htmlspecialchars($client['full_legal_name']); ?></h1>
 </header>
 
 <?php if ($message): ?>
@@ -125,36 +125,36 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="feedback error"><?php echo $error; ?></div>
 <?php endif; ?>
 
-<form action="edit_participant.php" method="POST">
-    <input type="hidden" name="id" value="<?php echo $participant['id']; ?>">
+<form action="edit_client.php" method="POST">
+    <input type="hidden" name="id" value="<?php echo $client['id']; ?>">
 
     <div class="ai-section">
         <h3>AI-Assisted Intake</h3>
         <div class="form-group">
             <label for="intake_notes">Raw Intake Notes</label>
-            <textarea id="intake_notes" name="intake_notes" rows="6" placeholder="Paste the full, unstructured intake notes here..."><?php echo htmlspecialchars($participant['intake_notes']); ?></textarea>
+            <textarea id="intake_notes" name="intake_notes" rows="6" placeholder="Paste the full, unstructured intake notes here..."><?php echo htmlspecialchars($client['intake_notes']); ?></textarea>
         </div>
         <button type="button" class="btn btn-secondary" id="summarize-with-ai">Summarize with AI</button>
     </div>
 
     <div class="form-grid">
         <div class="form-section">
-            <h3>Participant Details</h3>
+            <h3>Client Details</h3>
             <div class="form-group">
                 <label for="full_legal_name">Full Legal Name *</label>
-                <input type="text" id="full_legal_name" name="full_legal_name" value="<?php echo htmlspecialchars($participant['full_legal_name']); ?>" required>
+                <input type="text" id="full_legal_name" name="full_legal_name" value="<?php echo htmlspecialchars($client['full_legal_name']); ?>" required>
             </div>
             <div class="form-group">
-                <label for="ndis_participant_number">NDIS Participant Number</label>
-                <input type="text" id="ndis_participant_number" name="ndis_participant_number" value="<?php echo htmlspecialchars($participant['ndis_participant_number']); ?>">
+                <label for="ndis_client_number">NDIS Client Number</label>
+                <input type="text" id="ndis_client_number" name="ndis_client_number" value="<?php echo htmlspecialchars($client['ndis_client_number']); ?>">
             </div>
             <div class="form-group">
                 <label for="date_of_birth">Date of Birth</label>
-                <input type="date" id="date_of_birth" name="date_of_birth" value="<?php echo htmlspecialchars($participant['date_of_birth']); ?>">
+                <input type="date" id="date_of_birth" name="date_of_birth" value="<?php echo htmlspecialchars($client['date_of_birth']); ?>">
             </div>
              <div class="form-group">
                 <label for="preferred_contact_method">Preferred Contact Method</label>
-                <input type="text" id="preferred_contact_method" name="preferred_contact_method" value="<?php echo htmlspecialchars($participant['preferred_contact_method']); ?>">
+                <input type="text" id="preferred_contact_method" name="preferred_contact_method" value="<?php echo htmlspecialchars($client['preferred_contact_method']); ?>">
             </div>
         </div>
 
@@ -162,23 +162,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h3>Contact Info</h3>
             <div class="form-group">
                 <label for="primary_phone">Primary Phone</label>
-                <input type="tel" id="primary_phone" name="primary_phone" value="<?php echo htmlspecialchars($participant['primary_phone']); ?>">
+                <input type="tel" id="primary_phone" name="primary_phone" value="<?php echo htmlspecialchars($client['primary_phone']); ?>">
             </div>
             <div class="form-group">
                 <label for="email">Email</label>
-                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($participant['email']); ?>">
+                <input type="email" id="email" name="email" value="<?php echo htmlspecialchars($client['email']); ?>">
             </div>
             <div class="form-group">
                 <label for="address">Address</label>
-                <textarea id="address" name="address" rows="1"><?php echo htmlspecialchars($participant['address']); ?></textarea>
+                <textarea id="address" name="address" rows="1"><?php echo htmlspecialchars($client['address']); ?></textarea>
             </div>
              <div class="form-group">
                 <label for="emergency_contact_name">Emergency Contact Name</label>
-                <input type="text" id="emergency_contact_name" name="emergency_contact_name" value="<?php echo htmlspecialchars($participant['emergency_contact_name']); ?>">
+                <input type="text" id="emergency_contact_name" name="emergency_contact_name" value="<?php echo htmlspecialchars($client['emergency_contact_name']); ?>">
             </div>
              <div class="form-group">
                 <label for="emergency_contact_phone">Emergency Contact Phone</label>
-                <input type="tel" id="emergency_contact_phone" name="emergency_contact_phone" value="<?php echo htmlspecialchars($participant['emergency_contact_phone']); ?>">
+                <input type="tel" id="emergency_contact_phone" name="emergency_contact_phone" value="<?php echo htmlspecialchars($client['emergency_contact_phone']); ?>">
             </div>
         </div>
 
@@ -186,23 +186,23 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h3>Plan Details</h3>
             <div class="form-group">
                 <label for="ndis_plan_start_date">NDIS Plan Start Date</label>
-                <input type="date" id="ndis_plan_start_date" name="ndis_plan_start_date" value="<?php echo htmlspecialchars($participant['ndis_plan_start_date']); ?>">
+                <input type="date" id="ndis_plan_start_date" name="ndis_plan_start_date" value="<?php echo htmlspecialchars($client['ndis_plan_start_date']); ?>">
             </div>
             <div class="form-group">
                 <label for="ndis_plan_end_date">NDIS Plan End Date</label>
-                <input type="date" id="ndis_plan_end_date" name="ndis_plan_end_date" value="<?php echo htmlspecialchars($participant['ndis_plan_end_date']); ?>">
+                <input type="date" id="ndis_plan_end_date" name="ndis_plan_end_date" value="<?php echo htmlspecialchars($client['ndis_plan_end_date']); ?>">
             </div>
             <div class="form-group">
                 <label for="plan_manager_name">Plan Manager Name</label>
-                <input type="text" id="plan_manager_name" name="plan_manager_name" value="<?php echo htmlspecialchars($participant['plan_manager_name']); ?>">
+                <input type="text" id="plan_manager_name" name="plan_manager_name" value="<?php echo htmlspecialchars($client['plan_manager_name']); ?>">
             </div>
             <div class="form-group">
                 <label for="plan_manager_contact">Plan Manager Contact</label>
-                <input type="text" id="plan_manager_contact" name="plan_manager_contact" value="<?php echo htmlspecialchars($participant['plan_manager_contact']); ?>">
+                <input type="text" id="plan_manager_contact" name="plan_manager_contact" value="<?php echo htmlspecialchars($client['plan_manager_contact']); ?>">
             </div>
             <div class="form-group">
                 <label for="ndis_funding_budget_total">NDIS Funding Budget (Total)</label>
-                <input type="number" step="0.01" id="ndis_funding_budget_total" name="ndis_funding_budget_total" value="<?php echo htmlspecialchars($participant['ndis_funding_budget_total']); ?>">
+                <input type="number" step="0.01" id="ndis_funding_budget_total" name="ndis_funding_budget_total" value="<?php echo htmlspecialchars($client['ndis_funding_budget_total']); ?>">
             </div>
         </div>
 
@@ -210,15 +210,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
              <h3>Disability & Needs</h3>
             <div class="form-group">
                 <label for="primary_disability">Primary Disability</label>
-                <textarea id="primary_disability" name="primary_disability" rows="2"><?php echo htmlspecialchars($participant['primary_disability']); ?></textarea>
+                <textarea id="primary_disability" name="primary_disability" rows="2"><?php echo htmlspecialchars($client['primary_disability']); ?></textarea>
             </div>
             <div class="form-group">
                 <label for="support_needs_summary">Support Needs Summary</label>
-                <textarea id="support_needs_summary" name="support_needs_summary" rows="2"><?php echo htmlspecialchars($participant['support_needs_summary']); ?></textarea>
+                <textarea id="support_needs_summary" name="support_needs_summary" rows="2"><?php echo htmlspecialchars($client['support_needs_summary']); ?></textarea>
             </div>
              <div class="form-group">
                 <label for="communication_aids_methods">Communication Aids/Methods</label>
-                <textarea id="communication_aids_methods" name="communication_aids_methods" rows="2"><?php echo htmlspecialchars($participant['communication_aids_methods']); ?></textarea>
+                <textarea id="communication_aids_methods" name="communication_aids_methods" rows="2"><?php echo htmlspecialchars($client['communication_aids_methods']); ?></textarea>
             </div>
         </div>
 
@@ -226,22 +226,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <h3>Risk & Safety</h3>
              <div class="form-group">
                 <label for="behaviours_of_concern">Known Behaviours of Concern</label>
-                <textarea id="behaviours_of_concern" name="behaviours_of_concern" rows="3"><?php echo htmlspecialchars($participant['behaviours_of_concern']); ?></textarea>
+                <textarea id="behaviours_of_concern" name="behaviours_of_concern" rows="3"><?php echo htmlspecialchars($client['behaviours_of_concern']); ?></textarea>
             </div>
              <div class="form-group">
                 <label for="risk_assessment_summary">Detailed Risk Assessment Summary</label>
-                <textarea id="risk_assessment_summary" name="risk_assessment_summary" rows="3"><?php echo htmlspecialchars($participant['risk_assessment_summary']); ?></textarea>
+                <textarea id="risk_assessment_summary" name="risk_assessment_summary" rows="3"><?php echo htmlspecialchars($client['risk_assessment_summary']); ?></textarea>
             </div>
             <div class="form-group">
                 <label for="safety_plan">Safety/Restrictive Practices Plan</label>
-                <textarea id="safety_plan" name="safety_plan" rows="3"><?php echo htmlspecialchars($participant['safety_plan']); ?></textarea>
+                <textarea id="safety_plan" name="safety_plan" rows="3"><?php echo htmlspecialchars($client['safety_plan']); ?></textarea>
             </div>
         </div>
         
         <div class="form-section">
             <h3>Consent</h3>
             <div class="form-group">
-                <input type="checkbox" id="consent_for_info_sharing" name="consent_for_info_sharing" value="1" <?php echo $participant['consent_for_info_sharing'] ? 'checked' : ''; ?> style="width: auto; margin-right: 10px;">
+                <input type="checkbox" id="consent_for_info_sharing" name="consent_for_info_sharing" value="1" <?php echo $client['consent_for_info_sharing'] ? 'checked' : ''; ?> style="width: auto; margin-right: 10px;">
                 <label for="consent_for_info_sharing">Consent for information sharing has been recorded.</label>
             </div>
         </div>
@@ -249,7 +249,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div style="margin-top: 2rem;">
         <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="participant_detail.php?id=<?php echo $participant['id']; ?>" class="btn">Cancel</a>
+        <a href="client_detail.php?id=<?php echo $client['id']; ?>" class="btn">Cancel</a>
     </div>
 </form>
 

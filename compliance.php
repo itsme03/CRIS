@@ -12,19 +12,19 @@ try {
     $ninety_days_from_now = date('Y-m-d', strtotime('+90 days'));
 
     // NDIS Plan Reviews
-    $plan_stmt = $db->prepare("SELECT id, full_legal_name, ndis_plan_end_date FROM participants WHERE ndis_plan_end_date <= :end_date AND ndis_plan_end_date >= CURDATE() ORDER BY ndis_plan_end_date ASC");
+    $plan_stmt = $db->prepare("SELECT id, full_legal_name, ndis_plan_end_date FROM clients WHERE ndis_plan_end_date <= :end_date AND ndis_plan_end_date >= CURDATE() ORDER BY ndis_plan_end_date ASC");
     $plan_stmt->bindParam(':end_date', $ninety_days_from_now);
     $plan_stmt->execute();
     $plan_alerts = $plan_stmt->fetchAll(PDO::FETCH_ASSOC);
 
-    // Worker Screening Expiries
-    $screening_stmt = $db->prepare("SELECT id, full_name, ndis_worker_screening_expiry FROM support_workers WHERE ndis_worker_screening_expiry <= :end_date AND ndis_worker_screening_expiry >= CURDATE() ORDER BY ndis_worker_screening_expiry ASC");
+    // Staff Screening Expiries
+    $screening_stmt = $db->prepare("SELECT id, full_name, ndis_worker_screening_expiry FROM care_staff WHERE ndis_worker_screening_expiry <= :end_date AND ndis_worker_screening_expiry >= CURDATE() ORDER BY ndis_worker_screening_expiry ASC");
     $screening_stmt->bindParam(':end_date', $ninety_days_from_now);
     $screening_stmt->execute();
     $screening_alerts = $screening_stmt->fetchAll(PDO::FETCH_ASSOC);
 
     // First Aid Expiries
-    $fa_stmt = $db->prepare("SELECT id, full_name, first_aid_expiry FROM support_workers WHERE first_aid_expiry <= :end_date AND first_aid_expiry >= CURDATE() ORDER BY first_aid_expiry ASC");
+    $fa_stmt = $db->prepare("SELECT id, full_name, first_aid_expiry FROM care_staff WHERE first_aid_expiry <= :end_date AND first_aid_expiry >= CURDATE() ORDER BY first_aid_expiry ASC");
     $fa_stmt->bindParam(':end_date', $ninety_days_from_now);
     $fa_stmt->execute();
     $first_aid_alerts = $fa_stmt->fetchAll(PDO::FETCH_ASSOC);
@@ -108,7 +108,7 @@ function get_days_until_badge($date) {
             <?php else: ?>
                 <?php foreach ($plan_alerts as $alert): ?>
                     <li>
-                        <a href="participant_detail.php?id=<?php echo $alert['id']; ?>"><?php echo htmlspecialchars($alert['full_legal_name']); ?></a>
+                        <a href="client_detail.php?id=<?php echo $alert['id']; ?>"><?php echo htmlspecialchars($alert['full_legal_name']); ?></a>
                         <div><?php echo htmlspecialchars(date("d M Y", strtotime($alert['ndis_plan_end_date']))); ?> &nbsp; <?php echo get_days_until_badge($alert['ndis_plan_end_date']); ?></div>
                     </li>
                 <?php endforeach; ?>
@@ -117,14 +117,14 @@ function get_days_until_badge($date) {
     </div>
     
     <div class="alert-card">
-        <h2>Worker Screening Expiries</h2>
+        <h2>Staff Screening Expiries</h2>
         <ul class="alert-list">
             <?php if (empty($screening_alerts)): ?>
                 <li>No upcoming screening expiries.</li>
             <?php else: ?>
                 <?php foreach ($screening_alerts as $alert): ?>
                     <li>
-                        <a href="worker_detail.php?id=<?php echo $alert['id']; ?>"><?php echo htmlspecialchars($alert['full_name']); ?></a>
+                        <a href="staff_detail.php?id=<?php echo $alert['id']; ?>"><?php echo htmlspecialchars($alert['full_name']); ?></a>
                         <div><?php echo htmlspecialchars(date("d M Y", strtotime($alert['ndis_worker_screening_expiry']))); ?> &nbsp; <?php echo get_days_until_badge($alert['ndis_worker_screening_expiry']); ?></div>
                     </li>
                 <?php endforeach; ?>
@@ -140,7 +140,7 @@ function get_days_until_badge($date) {
             <?php else: ?>
                 <?php foreach ($first_aid_alerts as $alert): ?>
                     <li>
-                       <a href="worker_detail.php?id=<?php echo $alert['id']; ?>"><?php echo htmlspecialchars($alert['full_name']); ?></a>
+                       <a href="staff_detail.php?id=<?php echo $alert['id']; ?>"><?php echo htmlspecialchars($alert['full_name']); ?></a>
                        <div><?php echo htmlspecialchars(date("d M Y", strtotime($alert['first_aid_expiry']))); ?> &nbsp; <?php echo get_days_until_badge($alert['first_aid_expiry']); ?></div>
                     </li>
                 <?php endforeach; ?>

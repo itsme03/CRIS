@@ -2,11 +2,11 @@
 require_once 'db/config.php';
 require_once 'header.php';
 
-$workers = [];
+$care_staff = [];
 try {
     $db = db();
-    $stmt = $db->query("SELECT id, full_name, ndis_worker_screening_number, first_aid_expiry FROM support_workers ORDER BY created_at DESC");
-    $workers = $stmt->fetchAll(PDO::FETCH_ASSOC);
+    $stmt = $db->query("SELECT id, full_name, ndis_worker_screening_number, first_aid_expiry FROM care_staff ORDER BY created_at DESC");
+    $care_staff = $stmt->fetchAll(PDO::FETCH_ASSOC);
 } catch (PDOException $e) {
     echo '<div class="feedback error">Error: ' . $e->getMessage() . '</div>';
 }
@@ -14,8 +14,8 @@ try {
 ?>
 
 <header>
-    <h1>Support Workers</h1>
-    <a href="add_worker.php" class="btn btn-primary">Add New Worker</a>
+    <h1>Care Staff</h1>
+    <a href="add_staff.php" class="btn btn-primary">Add New Staff Member</a>
 </header>
 
 <table>
@@ -28,18 +28,18 @@ try {
         </tr>
     </thead>
     <tbody>
-        <?php if (empty($workers)): ?>
+        <?php if (empty($care_staff)):
             <tr>
-                <td colspan="4" style="text-align: center;">No support workers found.</td>
+                <td colspan="4" style="text-align: center;">No care staff found.</td>
             </tr>
-        <?php else: ?>
-            <?php foreach ($workers as $w): ?>
+        <?php else:
+            <?php foreach ($care_staff as $w):
                 <tr>
                     <td><?php echo htmlspecialchars($w['full_name']); ?></td>
                     <td><?php echo htmlspecialchars($w['ndis_worker_screening_number']); ?></td>
                     <td><?php echo htmlspecialchars(date("d M Y", strtotime($w['first_aid_expiry']))); ?></td>
                     <td>
-                        <a href="worker_detail.php?id=<?php echo $w['id']; ?>" class="btn">View</a>
+                        <a href="staff_detail.php?id=<?php echo $w['id']; ?>" class="btn">View</a>
                     </td>
                 </tr>
             <?php endforeach; ?>

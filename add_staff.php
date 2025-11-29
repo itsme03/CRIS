@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Full Name is a required field.");
         }
 
-        $sql = "INSERT INTO support_workers (
+        $sql = "INSERT INTO care_staff (
             full_name, contact_info, ndis_worker_screening_number, 
             ndis_worker_screening_expiry, first_aid_expiry, qualifications, hourly_rate
         ) VALUES (
@@ -33,7 +33,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt->execute();
         
-        $message = "Support worker successfully added!";
+        $message = "Care staff member successfully added!";
         
     } catch (Exception $e) {
         $error = "Error: " . $e->getMessage();
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <header>
-    <h1>Add New Support Worker</h1>
+    <h1>Add New Staff Member</h1>
 </header>
 
 <?php if ($message): ?>
@@ -53,7 +53,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="feedback error"><?php echo $error; ?></div>
 <?php endif; ?>
 
-<form action="add_worker.php" method="POST">
+<form action="add_staff.php" method="POST">
     <div class="form-grid" style="grid-template-columns: 1fr;">
         <div class="form-group">
             <label for="full_name">Full Name *</label>
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             <textarea id="qualifications" name="qualifications" rows="3"></textarea>
         </div>
         <div class="form-group">
-            <label for="ndis_worker_screening_number">NDIS Worker Screening Check Number</label>
+            <label for="ndis_worker_screening_number">NDIS Staff Screening Check Number</label>
             <input type="text" id="ndis_worker_screening_number" name="ndis_worker_screening_number">
         </div>
         <div class="form-group">
@@ -86,8 +86,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div style="margin-top: 2rem;">
-        <button type="submit" class="btn btn-primary">Add Worker</button>
-        <a href="workers.php" class="btn">Cancel</a>
+        <button type="submit" class="btn btn-primary">Add Staff Member</button>
+        <a href="care_staff.php" class="btn">Cancel</a>
     </div>
 </form>
 

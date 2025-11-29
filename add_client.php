@@ -16,15 +16,15 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             }
         }
 
-        $sql = "INSERT INTO participants (
-            full_legal_name, ndis_participant_number, date_of_birth, preferred_contact_method,
+        $sql = "INSERT INTO clients (
+            full_legal_name, ndis_client_number, date_of_birth, preferred_contact_method,
             primary_phone, email, address, emergency_contact_name, emergency_contact_phone,
             ndis_plan_start_date, ndis_plan_end_date, plan_manager_name, plan_manager_contact,
             ndis_funding_budget_total, primary_disability, support_needs_summary,
             communication_aids_methods, behaviours_of_concern, risk_assessment_summary,
             safety_plan, consent_for_info_sharing, intake_notes
         ) VALUES (
-            :full_legal_name, :ndis_participant_number, :date_of_birth, :preferred_contact_method,
+            :full_legal_name, :ndis_client_number, :date_of_birth, :preferred_contact_method,
             :primary_phone, :email, :address, :emergency_contact_name, :emergency_contact_phone,
             :ndis_plan_start_date, :ndis_plan_end_date, :plan_manager_name, :plan_manager_contact,
             :ndis_funding_budget_total, :primary_disability, :support_needs_summary,
@@ -37,7 +37,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $consent = isset($_POST['consent_for_info_sharing']) ? 1 : 0;
 
         $stmt->bindParam(':full_legal_name', $_POST['full_legal_name']);
-        $stmt->bindParam(':ndis_participant_number', $_POST['ndis_participant_number']);
+        $stmt->bindParam(':ndis_client_number', $_POST['ndis_client_number']);
         $stmt->bindParam(':date_of_birth', $_POST['date_of_birth']);
         $stmt->bindParam(':preferred_contact_method', $_POST['preferred_contact_method']);
         $stmt->bindParam(':primary_phone', $_POST['primary_phone']);
@@ -61,7 +61,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt->execute();
         
-        $message = "Participant successfully added!";
+        $message = "Client successfully added!";
         
     } catch (Exception $e) {
         $error = "Error: " . $e->getMessage();
@@ -76,7 +76,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </style>
 
 <header>
-    <h1>Add New Participant</h1>
+    <h1>Add New Client</h1>
 </header>
 
 <?php if ($message): ?>
@@ -87,7 +87,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="feedback error"><?php echo $error; ?></div>
 <?php endif; ?>
 
-<form action="add_participant.php" method="POST">
+<form action="add_client.php" method="POST">
     <div class="ai-section">
         <h3>AI-Assisted Intake</h3>
         <div class="form-group">
@@ -99,14 +99,14 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
     <div class="form-grid">
         <div class="form-section">
-            <h3>Participant Details</h3>
+            <h3>Client Details</h3>
             <div class="form-group">
                 <label for="full_legal_name">Full Legal Name *</label>
                 <input type="text" id="full_legal_name" name="full_legal_name" required>
             </div>
             <div class="form-group">
-                <label for="ndis_participant_number">NDIS Participant Number</label>
-                <input type="text" id="ndis_participant_number" name="ndis_participant_number">
+                <label for="ndis_client_number">NDIS Client Number</label>
+                <input type="text" id="ndis_client_number" name="ndis_client_number">
             </div>
             <div class="form-group">
                 <label for="date_of_birth">Date of Birth</label>
@@ -208,8 +208,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div style="margin-top: 2rem;">
-        <button type="submit" class="btn btn-primary">Add Participant</button>
-        <a href="participants.php" class="btn btn-secondary">Cancel</a>
+        <button type="submit" class="btn btn-primary">Add Client</button>
+        <a href="clients.php" class="btn btn-secondary">Cancel</a>
     </div>
 </form>
 

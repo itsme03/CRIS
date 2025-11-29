@@ -4,7 +4,7 @@ require_once 'config.php';
 try {
     $db = db();
     $sql = <<<SQL
-    CREATE TABLE IF NOT EXISTS `support_workers` (
+    CREATE TABLE IF NOT EXISTS `care_staff` (
         `id` INT AUTO_INCREMENT PRIMARY KEY,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         `full_name` VARCHAR(255) NOT NULL,
@@ -17,7 +17,7 @@ try {
     );
 SQL;
     $db->exec($sql);
-    echo "Table `support_workers` created successfully." . PHP_EOL;
+    echo "Table `care_staff` created successfully." . PHP_EOL;
 } catch (PDOException $e) {
     die("DB ERROR: " . $e->getMessage());
 }

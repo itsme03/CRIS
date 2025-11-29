@@ -4,36 +4,36 @@ require_once 'header.php';
 
 $message = '';
 $error = '';
-$participants = [];
-$workers = [];
+$clients = [];
+$care_staff = [];
 
 try {
     $db = db();
-    $participants = $db->query("SELECT id, full_legal_name FROM participants ORDER BY full_legal_name ASC")->fetchAll(PDO::FETCH_ASSOC);
-    $workers = $db->query("SELECT id, full_name FROM support_workers ORDER BY full_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $clients = $db->query("SELECT id, full_legal_name FROM clients ORDER BY full_legal_name ASC")->fetchAll(PDO::FETCH_ASSOC);
+    $care_staff = $db->query("SELECT id, full_name FROM care_staff ORDER BY full_name ASC")->fetchAll(PDO::FETCH_ASSOC);
 } catch (Exception $e) {
-    $error = "Failed to fetch participants or workers: " . $e->getMessage();
+    $error = "Failed to fetch clients or care staff: " . $e->getMessage();
 }
 
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     try {
-        if (empty($_POST['participant_id']) || empty($_POST['worker_id']) || empty($_POST['service_date'])) {
-            throw new Exception("Participant, Worker, and Service Date are required fields.");
+        if (empty($_POST['client_id']) || empty($_POST['staff_id']) || empty($_POST['service_date'])) {
+            throw new Exception("Client, Care Staff, and Service Date are required fields.");
         }
 
         $db = db();
-        $sql = "INSERT INTO service_logs (
-            participant_id, worker_id, service_date, ndis_line_item, 
+        $sql = "INSERT INTO bookings (
+            client_id, staff_id, service_date, ndis_line_item, 
             duration_minutes, service_notes, billing_status
         ) VALUES (
-            :participant_id, :worker_id, :service_date, :ndis_line_item, 
+            :client_id, :staff_id, :service_date, :ndis_line_item, 
             :duration_minutes, :service_notes, :billing_status
         )";
         
         $stmt = $db->prepare($sql);
 
-        $stmt->bindParam(':participant_id', $_POST['participant_id'], PDO::PARAM_INT);
-        $stmt->bindParam(':worker_id', $_POST['worker_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':client_id', $_POST['client_id'], PDO::PARAM_INT);
+        $stmt->bindParam(':staff_id', $_POST['staff_id'], PDO::PARAM_INT);
         $stmt->bindParam(':service_date', $_POST['service_date']);
         $stmt->bindParam(':ndis_line_item', $_POST['ndis_line_item']);
         $stmt->bindParam(':duration_minutes', $_POST['duration_minutes'], PDO::PARAM_INT);
@@ -42,7 +42,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt->execute();
         
-        $message = "Service log successfully added!";
+        $message = "Booking successfully added!";
         
     } catch (Exception $e) {
         $error = "Error: " . $e->getMessage();
@@ -51,7 +51,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <header>
-    <h1>Log a New Service</h1>
+    <h1>Log a New Booking</h1>
 </header>
 
 <?php if ($message): ?>
@@ -62,22 +62,22 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="feedback error"><?php echo $error; ?></div>
 <?php endif; ?>
 
-<form action="log_service.php" method="POST">
+<form action="log_booking.php" method="POST">
     <div class="form-grid">
         <div class="form-group">
-            <label for="participant_id">Participant *</label>
-            <select id="participant_id" name="participant_id" required>
-                <option value="">Select a participant...</option>
-                <?php foreach ($participants as $p): ?>
+            <label for="client_id">Client *</label>
+            <select id="client_id" name="client_id" required>
+                <option value="">Select a client...</option>
+                <?php foreach ($clients as $p): ?>
                     <option value="<?php echo $p['id']; ?>"><?php echo htmlspecialchars($p['full_legal_name']); ?></option>
                 <?php endforeach; ?>
             </select>
         </div>
          <div class="form-group">
-            <label for="worker_id">Support Worker *</label>
-            <select id="worker_id" name="worker_id" required>
-                <option value="">Select a worker...</option>
-                <?php foreach ($workers as $w): ?>
+            <label for="staff_id">Care Staff *</label>
+            <select id="staff_id" name="staff_id" required>
+                <option value="">Select a staff member...</option>
+                <?php foreach ($care_staff as $w): ?>
                     <option value="<?php echo $w['id']; ?>"><?php echo htmlspecialchars($w['full_name']); ?></option>
                 <?php endforeach; ?>
             </select>
@@ -109,8 +109,8 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     </div>
 
     <div style="margin-top: 2rem;">
-        <button type="submit" class="btn btn-primary">Log Service</button>
-        <a href="service_logs.php" class="btn">Cancel</a>
+        <button type="submit" class="btn btn-primary">Log Booking</button>
+        <a href="bookings.php" class="btn">Cancel</a>
     </div>
 </form>
 

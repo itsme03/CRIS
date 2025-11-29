@@ -4,11 +4,11 @@ require_once 'config.php';
 try {
     $db = db();
     $sql = <<<SQL
-    CREATE TABLE IF NOT EXISTS `participants` (
+    CREATE TABLE IF NOT EXISTS `clients` (
         `id` INT AUTO_INCREMENT PRIMARY KEY,
         `created_at` TIMESTAMP DEFAULT CURRENT_TIMESTAMP,
         `full_legal_name` VARCHAR(255) NOT NULL,
-        `ndis_participant_number` VARCHAR(50),
+        `ndis_client_number` VARCHAR(50),
         `date_of_birth` DATE,
         `preferred_contact_method` VARCHAR(100),
         `primary_phone` VARCHAR(50),
@@ -27,11 +27,12 @@ try {
         `behaviours_of_concern` TEXT,
         `risk_assessment_summary` TEXT,
         `safety_plan` TEXT,
-        `consent_for_info_sharing` BOOLEAN DEFAULT FALSE
+        `consent_for_info_sharing` BOOLEAN DEFAULT FALSE,
+        `intake_notes` TEXT
     );
 SQL;
     $db->exec($sql);
-    echo "Table `participants` created successfully." . PHP_EOL;
+    echo "Table `clients` created successfully." . PHP_EOL;
 } catch (PDOException $e) {
     die("DB ERROR: " . $e->getMessage());
 }

@@ -14,10 +14,9 @@
 $current_page = basename($_SERVER['PHP_SELF']);
 $pages = [
     'index.php' => 'Dashboard',
-    'participants.php' => 'Participants',
-    'workers.php' => 'Support Workers',
-    'service_logs.php' => 'Service Logs',
-    'compliance.php' => 'Compliance',
+            'clients.php' => 'Clients',
+            'care_staff.php' => 'Care Staff',
+            'bookings.php' => 'Bookings',    'compliance.php' => 'Compliance',
 ];
 ?>
 

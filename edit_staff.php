@@ -4,25 +4,25 @@ require_once 'header.php';
 
 $message = '';
 $error = '';
-$worker = null;
+$staff = null;
 
 if (!isset($_GET['id']) && !isset($_POST['id'])) {
-    echo '<div class="feedback error">No worker ID specified.</div>';
+    echo '<div class="feedback error">No staff ID specified.</div>';
     require_once 'footer.php';
     exit;
 }
 
-$worker_id = $_GET['id'] ?? $_POST['id'];
+$staff_id = $_GET['id'] ?? $_POST['id'];
 
 try {
     $db = db();
-    $stmt = $db->prepare("SELECT * FROM support_workers WHERE id = :id");
-    $stmt->bindParam(':id', $worker_id, PDO::PARAM_INT);
+    $stmt = $db->prepare("SELECT * FROM care_staff WHERE id = :id");
+    $stmt->bindParam(':id', $staff_id, PDO::PARAM_INT);
     $stmt->execute();
-    $worker = $stmt->fetch(PDO::FETCH_ASSOC);
+    $staff = $stmt->fetch(PDO::FETCH_ASSOC);
 
-    if (!$worker) {
-        throw new Exception("Support worker not found.");
+    if (!$staff) {
+        throw new Exception("Care staff member not found.");
     }
 } catch (Exception $e) {
     $error = "Error: " . $e->getMessage();
@@ -39,7 +39,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             throw new Exception("Full Name and ID are required fields.");
         }
 
-        $sql = "UPDATE support_workers SET 
+        $sql = "UPDATE care_staff SET 
             full_name = :full_name, 
             contact_info = :contact_info, 
             ndis_worker_screening_number = :ndis_worker_screening_number, 
@@ -51,9 +51,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt = $db->prepare($sql);
 
-        $worker_id = $_POST['id'];
+        $staff_id = $_POST['id'];
 
-        $stmt->bindParam(':id', $worker_id, PDO::PARAM_INT);
+        $stmt->bindParam(':id', $staff_id, PDO::PARAM_INT);
         $stmt->bindParam(':full_name', $_POST['full_name']);
         $stmt->bindParam(':contact_info', $_POST['contact_info']);
         $stmt->bindParam(':ndis_worker_screening_number', $_POST['ndis_worker_screening_number']);
@@ -64,7 +64,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         
         $stmt->execute();
         
-        header("Location: worker_detail.php?id=" . $worker_id . "&message=updated");
+        header("Location: staff_detail.php?id=" . $staff_id . "&message=updated");
         exit;
         
     } catch (Exception $e) {
@@ -74,7 +74,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 ?>
 
 <header>
-    <h1>Edit Support Worker: <?php echo htmlspecialchars($worker['full_name']); ?></h1>
+    <h1>Edit Staff Member: <?php echo htmlspecialchars($staff['full_name']); ?></h1>
 </header>
 
 <?php if ($message): ?>
@@ -85,42 +85,42 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 <div class="feedback error"><?php echo $error; ?></div>
 <?php endif; ?>
 
-<form action="edit_worker.php" method="POST">
-    <input type="hidden" name="id" value="<?php echo $worker['id']; ">
+<form action="edit_staff.php" method="POST">
+    <input type="hidden" name="id" value="<?php echo $staff['id']; ">
     <div class="form-grid" style="grid-template-columns: 1fr;">
         <div class="form-group">
             <label for="full_name">Full Name *</label>
-            <input type="text" id="full_name" name="full_name" value="<?php echo htmlspecialchars($worker['full_name']); ?>" required>
+            <input type="text" id="full_name" name="full_name" value="<?php echo htmlspecialchars($staff['full_name']); ?>" required>
         </div>
         <div class="form-group">
             <label for="contact_info">Contact Info (Phone/Email)</label>
-            <textarea id="contact_info" name="contact_info" rows="2"><?php echo htmlspecialchars($worker['contact_info']); ?></textarea>
+            <textarea id="contact_info" name="contact_info" rows="2"><?php echo htmlspecialchars($staff['contact_info']); ?></textarea>
         </div>
         <div class="form-group">
             <label for="qualifications">Qualifications/Certificates</label>
-            <textarea id="qualifications" name="qualifications" rows="3"><?php echo htmlspecialchars($worker['qualifications']); ?></textarea>
+            <textarea id="qualifications" name="qualifications" rows="3"><?php echo htmlspecialchars($staff['qualifications']); ?></textarea>
         </div>
         <div class="form-group">
-            <label for="ndis_worker_screening_number">NDIS Worker Screening Check Number</label>
-            <input type="text" id="ndis_worker_screening_number" name="ndis_worker_screening_number" value="<?php echo htmlspecialchars($worker['ndis_worker_screening_number']); ?>">
+            <label for="ndis_worker_screening_number">NDIS Staff Screening Check Number</label>
+            <input type="text" id="ndis_worker_screening_number" name="ndis_worker_screening_number" value="<?php echo htmlspecialchars($staff['ndis_worker_screening_number']); ?>">
         </div>
         <div class="form-group">
             <label for="ndis_worker_screening_expiry">Screening Check Expiry Date</label>
-            <input type="date" id="ndis_worker_screening_expiry" name="ndis_worker_screening_expiry" value="<?php echo htmlspecialchars($worker['ndis_worker_screening_expiry']); ?>">
+            <input type="date" id="ndis_worker_screening_expiry" name="ndis_worker_screening_expiry" value="<?php echo htmlspecialchars($staff['ndis_worker_screening_expiry']); ?>">
         </div>
         <div class="form-group">
             <label for="first_aid_expiry">First Aid Certificate Expiry Date</label>
-            <input type="date" id="first_aid_expiry" name="first_aid_expiry" value="<?php echo htmlspecialchars($worker['first_aid_expiry']); ?>">
+            <input type="date" id="first_aid_expiry" name="first_aid_expiry" value="<?php echo htmlspecialchars($staff['first_aid_expiry']); ?>">
         </div>
         <div class="form-group">
             <label for="hourly_rate">Hourly Rate</label>
-            <input type="number" step="0.01" id="hourly_rate" name="hourly_rate" value="<?php echo htmlspecialchars($worker['hourly_rate']); ?>">
+            <input type="number" step="0.01" id="hourly_rate" name="hourly_rate" value="<?php echo htmlspecialchars($staff['hourly_rate']); ?>">
         </div>
     </div>
 
     <div style="margin-top: 2rem;">
         <button type="submit" class="btn btn-primary">Save Changes</button>
-        <a href="worker_detail.php?id=<?php echo $worker['id']; ?>" class="btn">Cancel</a>
+        <a href="staff_detail.php?id=<?php echo $staff['id']; ?>" class="btn">Cancel</a>
     </div>
 </form>
 
